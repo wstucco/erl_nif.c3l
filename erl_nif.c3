@@ -1,5 +1,4 @@
 module erl_nif;
-import std::io;
 
 const int ERL_NIF_MAJOR_VERSION = 2;
 const int ERL_NIF_MINOR_VERSION = 17;
@@ -17,6 +16,7 @@ def ErlNifFuncPtr = fn ErlNifTerm(
     int argc,
     ErlNifTerm* argv
 );
+
 
 struct ErlNifFunc {
     char* name;
@@ -72,18 +72,37 @@ struct ErlNifResourceTypeInit {
     ErlNifResourceDynCall* dyncall;
 }
 
-fn ErlNifTerm enif_make_string(ErlNifEnv* env, char* str, ErlNifCharEncoding enc) {
+fn ErlNifTerm enif_make_string(ErlNifEnv* env, char* str, ErlNifCharEncoding enc = ErlNifCharEncoding.ERL_NIF_LATIN1) {
    return _enif_make_string(env, str, enc.value);
+}
+
+fn ErlNifTerm enif_make_tuple(ErlNifEnv* env, ErlNifTerm[] arr) {
+    return enif_make_tuple_from_array(env, arr, arr.len);
+}
+
+fn ErlNifTerm enif_make_tuple2(ErlNifEnv* env, ErlNifTerm t1, ErlNifTerm t2) {
+    return enif_make_tuple(env, {t1, t2});
+}
+
+fn ErlNifTerm enif_make_list(ErlNifEnv* env, ErlNifTerm[] arr) {
+    return enif_make_list_from_array(env, arr, arr.len);
 }
 
 extern fn ErlNifTerm _enif_make_string(ErlNifEnv*, char*, int) @extern("enif_make_string");
 extern fn ErlNifTerm enif_make_int(ErlNifEnv*, int);
-extern fn ErlNifTerm enif_make_badarg(ErlNifEnv* env);
+extern fn ErlNifTerm enif_make_badarg(ErlNifEnv*);
 extern fn int enif_get_int(ErlNifEnv*, ErlNifTerm, int*);
+extern fn ErlNifTerm enif_make_atom(ErlNifEnv*, char*);
+extern fn ErlNifTerm enif_make_list_from_array(ErlNifEnv*, ErlNifTerm[], uint);
+extern fn ErlNifTerm enif_make_tuple_from_array(ErlNifEnv*, ErlNifTerm[], uint);
 
 const ErlNifFunc[*] NIF_FUNCS = {
     {"hello", 0, &hello, 0},
     {"add", 2, &add, 0},
+    {"atom", 0, &atom, 0},
+    {"tuple", 0, &tuple, 0},
+    {"tuple2", 0, &tuple2, 0},
+    {"list", 0, &list, 0},
 };
 
 const ErlNifEntry NIF_ENTRY = {
@@ -103,34 +122,58 @@ const ErlNifEntry NIF_ENTRY = {
 };
 
 fn ErlNifEntry* nif_init() @export("nif_init") {
-    io::printn("nif_init");
     return &NIF_ENTRY;
 }
 
 fn ErlNifTerm hello(ErlNifEnv* env, int argc, ErlNifTerm* argv)
 {
-    char* hello = "Hello World";
-    ErlNifTerm result = enif_make_string(env, hello, ErlNifCharEncoding.ERL_NIF_LATIN1);
-    io::printn(ErlNifCharEncoding.ERL_NIF_LATIN1.value);
-    io::printfn("result = %s", result);
+    ErlNifTerm result = enif_make_string(env, "Hello World", ErlNifCharEncoding.ERL_NIF_LATIN1);
     return result;
+}
+
+fn ErlNifTerm atom(ErlNifEnv* env, int argc, ErlNifTerm* argv)
+{
+    ErlNifTerm result = enif_make_atom(env, "atom");
+    return result;
+}
+
+fn ErlNifTerm tuple(ErlNifEnv* env, int argc, ErlNifTerm* argv)
+{
+    ErlNifTerm t1 = enif_make_atom(env, "error");
+    ErlNifTerm t2 = enif_make_atom(env, "not_implemented");
+    return enif_make_tuple(env, {t1, t2});
+}
+
+fn ErlNifTerm tuple2(ErlNifEnv* env, int argc, ErlNifTerm* argv)
+{
+    return enif_make_tuple2(
+        env,
+        enif_make_atom(env, "error"),
+        enif_make_string(env, "not found", ErlNifCharEncoding.ERL_NIF_LATIN1)
+    );
+}
+
+fn ErlNifTerm list(ErlNifEnv* env, int argc, ErlNifTerm* argv)
+{
+    ErlNifTerm t1 = enif_make_atom(env, "error");
+    ErlNifTerm t2 = enif_make_atom(env, "not_implemented");
+    ErlNifTerm t3 = enif_make_int(env, 666);
+    ErlNifTerm t4 = enif_make_string(env, "a string");
+    return enif_make_list(env, {t1, t2, t3, t4});
 }
 
 fn ErlNifTerm add(ErlNifEnv* env, int argc, ErlNifTerm* argv)
 {
-    int a;
-    int b;
-
     if (argc != 2) {
         return enif_make_badarg(env);
     }
+
+    int a;
+    int b;
 
     enif_get_int(env, argv[0], &a);
     enif_get_int(env, argv[1], &b);
 
     int result = a + b;
-    io::printfn("result = %d", result);
-
-    //return enif_make_string(env, "Hello World", ErlNifCharEncoding.ERL_NIF_LATIN1);
     return enif_make_int(env, result);
 }
