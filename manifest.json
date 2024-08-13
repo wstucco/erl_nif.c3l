@@ -7,14 +7,10 @@
     "linux-x86": {},
     "linux-x64": {},
     "macos-aarch64": {
-      "link-args": [
-        "-fno-pie -fPIC -g -bundle -flat_namespace -undefined dynamic_lookup"
-      ]
+      "link-args": ["-fno-pie -fPIC -dynamiclib -undefined dynamic_lookup"]
     },
     "macos-x64": {
-      "link-args": [
-        "-fno-pie -fPIC -g -bundle -flat_namespace -undefined dynamic_lookup"
-      ]
+      "link-args": ["-fno-pie -fPIC -dynamiclib -undefined dynamic_lookup"]
     },
     "netbsd-x64": {},
     "openbsd-x64": {}
