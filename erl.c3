@@ -6,18 +6,12 @@ const NIF_MAJOR_VERSION = enif::ERL_NIF_MAJOR_VERSION;
 const NIF_MINOR_VERSION = enif::ERL_NIF_MINOR_VERSION;
 const NIF_MIN_ERTS_VERSION = enif::ERL_NIF_MIN_ERTS_VERSION;
 
-// FAULTS
-fault Err
-{
-    INVALID_OR_OUT_OF_BOUNDS_INT
-}
-
 // TYPEDEFS
 distinct ZString = inline char*;
 distinct NifEntry = ErlNifEntry;
 def NifEnv = ErlNifEnv;
 def NifFunc = ErlNifFunc;
-distinct NifFuncPtr = ErlNifFuncPtr;
+def NifFuncPtr = fn NifTerm(NifEnv*, int, NifTerm*);
 distinct NifResourceTypeInit = ErlNifResourceTypeInit;
 def NifTerm = ErlNifTerm;
 
@@ -28,6 +22,7 @@ enum NifCharEncoding : int (uint value) {
 }
 
 // API
+
 fn NifTerm make_atom(NifEnv* env, ZString name) {
     return enif::make_atom(env, name);
 }
@@ -87,7 +82,7 @@ fn NifTerm make_list(NifEnv* env, NifTerm[] arr) {
 fn int! get_int(NifEnv* env, NifTerm term) {
     int out;
     if(!enif::get_int(env, term, &out)) {
-        return Err.INVALID_OR_OUT_OF_BOUNDS_INT?;
+        return ConversionResult.VALUE_OUT_OF_RANGE?;
     }
 
     return out;
