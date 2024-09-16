@@ -189,7 +189,7 @@ extern fn void free(void* ptr) @extern("enif_free");
 extern fn void free_env(ErlNifEnv* env) @extern("enif_free_env");
 extern fn void free_iovec(ErlNifIOVec* iov) @extern("enif_free_iovec");
 extern fn int get_atom(ErlNifEnv* env, ErlNifTerm term, char* buf, ulong size, ErlNifCharEncoding encoding) @extern("enif_get_atom");
-extern fn int get_atom_length(ErlNifEnv* env, ErlNifTerm term, ulong* len, ErlNifCharEncoding encoding) @extern("enif_get_atom_length");
+extern fn int get_atom_length(ErlNifEnv* env, ErlNifTerm term, usz* len, ErlNifCharEncoding encoding) @extern("enif_get_atom_length");
 extern fn int get_double(ErlNifEnv* env, ErlNifTerm term, double* dp) @extern("enif_get_double");
 extern fn int get_int(ErlNifEnv* env, ErlNifTerm term, int* ip) @extern("enif_get_int");
 extern fn int get_int64(ErlNifEnv* env, ErlNifTerm term, ErlNifSInt64* ip) @extern("enif_get_int64");
@@ -342,12 +342,3 @@ extern fn int vfprintf(File* stream, char* format, ap...) @extern("enif_vfprintf
 extern fn int vsnprintf(char* str, usz size, char* format, ap...) @extern("enif_vsnprintf");
 extern fn int whereis_pid(ErlNifEnv* caller_env, ErlNifTerm name, ErlNifPid* pid) @extern("enif_whereis_pid");
 extern fn int whereis_port(ErlNifEnv* caller_env, ErlNifTerm name, ErlNifPort* port) @extern("enif_whereis_port");
-
-
-//extern fn ErlNifTerm make_string(ErlNifEnv*, char*, int) @extern("enif_make_string");
-//extern fn ErlNifTerm make_int(ErlNifEnv*, int) @extern("enif_make_int");
-//extern fn ErlNifTerm make_badarg(ErlNifEnv*) @extern("enif_make_badarg");
-//extern fn int get_int(ErlNifEnv*, ErlNifTerm, int*) @extern("enif_get_int");
-//extern fn ErlNifTerm make_atom(ErlNifEnv*, char*) @extern("enif_make_atom");
-//extern fn ErlNifTerm make_list_from_array(ErlNifEnv*, ErlNifTerm[], uint) @extern("enif_make_list_from_array");
-//extern fn ErlNifTerm make_tuple_from_array(ErlNifEnv*, ErlNifTerm[], uint) @extern("enif_make_tuple_from_array");
